@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/PechatnovVladimir/pvv22_demo_bot/internal/app/commands"
 	"github.com/PechatnovVladimir/pvv22_demo_bot/internal/service/product"
 	"github.com/joho/godotenv"
 
@@ -37,6 +38,8 @@ func main() {
 
 	productService := product.NewService()
 
+	commander := commands.NewCommander(bot, productService)
+
 	for update := range updates {
 		if update.Message == nil {
 			continue
@@ -44,39 +47,11 @@ func main() {
 
 		switch update.Message.Command() {
 		case "help":
-			helpCommand(bot, update.Message)
+			commander.Help(update.Message)
 		case "list":
-			listCommand(bot, update.Message, productService)
+			commander.List(update.Message)
 		default:
-			defaultBehavior(bot, update.Message)
+			commander.Default(update.Message)
 		}
 	}
-}
-
-func helpCommand(bot *tgbotapi.BotAPI, inputMessage *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(inputMessage.Chat.ID,
-		"/help - help\n"+
-			"/list - list products\n"+
-			"Антон привет тебе большой от бота",
-	)
-	bot.Send(msg)
-}
-
-func listCommand(bot *tgbotapi.BotAPI, inputMessage *tgbotapi.Message, productService *product.Service) {
-	outMsgText := "Список продуктов: \n\n"
-	products := productService.List()
-	for _, p := range products {
-		outMsgText += p.Title
-		outMsgText += "\n"
-
-	}
-	msg := tgbotapi.NewMessage(inputMessage.Chat.ID, outMsgText)
-	bot.Send(msg)
-}
-
-func defaultBehavior(bot *tgbotapi.BotAPI, inputMessage *tgbotapi.Message) {
-	log.Printf("[%s] %s", inputMessage.From.UserName, inputMessage.Text)
-	msg := tgbotapi.NewMessage(inputMessage.Chat.ID, "Привет от pvv: "+inputMessage.Text)
-	msg.ReplyToMessageID = inputMessage.MessageID
-	bot.Send(msg)
 }
