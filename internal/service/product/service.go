@@ -1,5 +1,7 @@
 package product
 
+import "errors"
+
 type Service struct{}
 
 func NewService() *Service {
@@ -10,9 +12,12 @@ func (s *Service) List() []Product {
 	return allProducts
 }
 
-func (s *Service) GetByID(idx int) string {
-	if idx >= 0 && idx < len(allProducts) {
-		return allProducts[idx].Title
+func (s *Service) Get(idx int) (*Product, error) {
+
+	if idx > 0 && idx < len(allProducts) {
+		return &allProducts[idx], nil
 	}
-	return "номер за пределами разумного"
+
+	return nil, errors.New("некорректный код продукта")
+
 }

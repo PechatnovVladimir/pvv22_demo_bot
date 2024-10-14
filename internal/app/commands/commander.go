@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"log"
+
 	"github.com/PechatnovVladimir/pvv22_demo_bot/internal/service/product"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -21,7 +23,14 @@ func NewCommander(
 	}
 }
 
-func (c *Commander) HandleUpdate(update tgbotapi.Update){
+func (c *Commander) HandleUpdate(update tgbotapi.Update) {
+
+	defer func() {
+		if panicValue := recover(); panicValue != nil {
+			log.Printf("recovered from panic: %v", panicValue)
+		}
+	}()
+
 	if update.Message == nil {
 		return
 	}
@@ -35,6 +44,6 @@ func (c *Commander) HandleUpdate(update tgbotapi.Update){
 		c.Get(update.Message)
 	default:
 		c.Default(update.Message)
-	}	
+	}
 
 }
