@@ -1,7 +1,9 @@
 package commands
 
 import (
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/PechatnovVladimir/pvv22_demo_bot/internal/service/product"
 
@@ -30,6 +32,17 @@ func (c *Commander) HandleUpdate(update tgbotapi.Update) {
 			log.Printf("recovered from panic: %v", panicValue)
 		}
 	}()
+
+	if update.CallbackQuery != nil {
+		args := strings.Split(update.CallbackQuery.Data, "_")
+		msg := tgbotapi.NewMessage(
+			update.CallbackQuery.Message.Chat.ID,
+			fmt.Sprintf("Command: %s\n", args[0])+
+				fmt.Sprintf("Offset: %s\n", args[1]),
+		)
+		c.bot.Send(msg)
+		return
+	}
 
 	if update.Message == nil {
 		return

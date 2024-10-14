@@ -11,5 +11,11 @@ func (c *Commander) List(inputMessage *tgbotapi.Message) {
 
 	}
 	msg := tgbotapi.NewMessage(inputMessage.Chat.ID, outMsgText)
+
+	msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("next page", "list_10"),
+		),
+	)
 	c.bot.Send(msg)
 }
